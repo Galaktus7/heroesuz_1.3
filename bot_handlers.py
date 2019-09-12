@@ -18,7 +18,7 @@ def join_timer(game):
             break
         if i % 60 == 0:
             Keyboard=types.InlineKeyboardMarkup()
-            Keyboard.add(types.InlineKeyboardButton(text='Присоединиться', url='telegram.me/warsuzbot?start='+str(game.cid)))
+            Keyboard.add(types.InlineKeyboardButton(text='Присоединиться', url='telegram.me/heroesuz_bot?start='+str(game.cid)))
             bot.send_message(game.cid, "⏱*O'yinga qo'shilish uchun* " + str(i/60) +" *daqiqa qoldi!*\n*🖲Qo'shilish uchun* /join *knopkasini bosing!*", parse_mode='markdown', reply_markup=Keyboard)
         time.sleep(1)
     game.runTimer = False
