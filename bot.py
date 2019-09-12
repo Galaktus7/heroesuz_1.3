@@ -694,7 +694,7 @@ def action(call):
 
 @bot.message_handler(content_types=["text"])
 def start(message):
-    if message.chat.id == 379168159 and Main_classes.ruporready:
+    if message.chat.id == 947530682 and Main_classes.ruporready:
         Main_classes.ruporready = False
         list = datahandler.getallplayers()
         for x in list:
@@ -702,9 +702,9 @@ def start(message):
                 bot.send_message(x[0], message.text)
             except:
                 pass
-    elif message.text == 'исправить' and message.chat.id == 379168159:
+    elif message.text == 'исправить' and message.chat.id == 947530682:
         datahandler.refresh_string()
-    elif message.text[:15] == 'добавить оружие' and message.chat.id == 379168159:
+    elif message.text[:15] == 'добавить оружие' and message.chat.id == 947530682:
         data = message.text.split(' ')
         if len(data) == 4:
             weapon_name = data[2]
@@ -749,7 +749,7 @@ def start(message):
         else:
             bot.send_message(message.from_user.id, 'Не успешно')
 
-    elif message.text[:8] == 'очистить' and message.chat.id == 379168159:
+    elif message.text[:8] == 'очистить' and message.chat.id == 947530682:
         data = message.text.split(' ')
         datahandler.delete_inventory(data[1])
 bot.skip_pending = True
