@@ -1,6 +1,6 @@
 import os
 
-token = os.environ['TELEGRAM_TOKEN']
+token = os.environ['753564450:AAEOQJwK6m4MCMJGS7-gLANNN1s6OKa0dR4']
 ratid = 'AgADAgAD16oxG9-58El6mRZI5mm-Mpi7UQ8ABA8jLU1MjYvXy3cCAAEC'
 newid = 'AgADAgADZKsxG-J-QEnus47tCWISj0LXtw8ABGM-GFUtb-Ch4-0AAgI'
 terrorid = 'AgADAgADv6oxG1fM8UlDIdnkwS0WrnNKXw8ABMzfzmQ3gY100AABBAABAg'
