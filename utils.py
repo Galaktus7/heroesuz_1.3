@@ -371,102 +371,101 @@ def get_first_ability(player):
     maxchoiceint = 5
     choice = []
 
-    while len(choice) < maxchoiceint:
-        x = random.choice(special_abilities.abilities)
-        if player.weapon.Melee:
-            if len(player.team.players) == 1:
-                if x not in choice and x not in player.abilities and not x.RangeOnly and not x.TeamOnly:
-                    choice.append(x)
-            else:
-                if x not in choice and x not in player.abilities and not x.RangeOnly:
-                    choice.append(x)
+    unique_abilities_map = {
+        379168159: [special_abilities.Triseps],
+        265872172: [special_abilities.Isaev, special_abilities.Titan, special_abilities.Shayton, special_abilities.Hayot, special_abilities.Hukmdor],
+        5419613050: [special_abilities.Shayton, special_abilities.Hayot, special_abilities.Hukmdor, special_abilities.Titan],
+        1346718456: [special_abilities.Isaev],
+    }
+
+    all_abilities = [ab for ab in special_abilities.abilities if ab not in player.abilities]
+
+    if player.weapon.Melee:
+        all_abilities = [ab for ab in all_abilities if not ab.RangeOnly]
+    else:
+        all_abilities = [ab for ab in all_abilities if not ab.MeleeOnly]
+
+    # Добавим 4 обычные + 1 уникальную (если есть)
+    unique_pool = unique_abilities_map.get(player.chat_id, [])
+    normal_pool = [ab for ab in all_abilities if ab not in unique_pool]
+
+    if len(normal_pool) >= 4:
+        choice = random.sample(normal_pool, 4)
+    else:
+        choice = normal_pool[:]
+
+    if unique_pool:
+        # Возьмём одну случайную уникальную
+        unique = random.choice(unique_pool)
+        if unique not in choice:
+            choice.append(unique)
+
+    # Создание кнопок
+    for ab in choice:
+        if ab in special_abilities.unique_abilities:
+            callback_data = f'unique_a{special_abilities.unique_abilities.index(ab)}'
+            info_data = f'unique_i{special_abilities.unique_abilities.index(ab)}'
         else:
-            if len(player.team.players) == 1:
-                if x not in choice and x not in player.abilities and not x.MeleeOnly and not x.TeamOnly:
-                    choice.append(x)
-            else:
-                if x not in choice and x not in player.abilities and not x.MeleeOnly:
-                    choice.append(x)
+            callback_data = f'a{special_abilities.abilities.index(ab)}'
+            info_data = f'i{special_abilities.abilities.index(ab)}'
 
-    for c in choice:
-        callback_button1 = types.InlineKeyboardButton(
-            text=c.name,
-            callback_data='a' + str(special_abilities.abilities.index(c))
-        )
-        callback_button2 = types.InlineKeyboardButton(
-            text='Info',
-            callback_data='i' + str(special_abilities.abilities.index(c))
-        )
-        keyboard.add(callback_button1, callback_button2)
-
-    # Добавление уникальных способностей (если игрок имеет доступ)
-    if player.chat_id in [1346718456, 265872172, 5419613050]:
-        for ability in special_abilities.unique_abilities:
-            btn1 = types.InlineKeyboardButton(
-                text=ability.name,
-                callback_data='unique_a' + str(special_abilities.unique_abilities.index(ability))
-            )
-            btn2 = types.InlineKeyboardButton(
-                text='Info',
-                callback_data='unique_i' + str(special_abilities.unique_abilities.index(ability))
-            )
-            keyboard.add(btn1, btn2)
+        btn_select = types.InlineKeyboardButton(text=ab.name, callback_data=callback_data)
+        btn_info = types.InlineKeyboardButton(text='Info', callback_data=info_data)
+        keyboard.add(btn_select, btn_info)
 
     bot.send_message(
         player.chat_id,
-        f'🧠 Qobiliyatlarni tanlang. Maksimal: {player.maxabilities}',
+        f'🧠 Qobiliyatlarni tanlang. Maksimal ruxsat etilgan: {player.maxabilities}',
         reply_markup=keyboard
     )
-
+    
 def get_ability(player):
     keyboard = types.InlineKeyboardMarkup()
     maxchoiceint = 5
     choice = []
 
-    while len(choice) < maxchoiceint:
-        x = random.choice(special_abilities.abilities)
-        if player.weapon.Melee:
-            if len(player.team.players) == 1:
-                if x not in choice and x not in player.abilities and not x.RangeOnly and not x.TeamOnly:
-                    choice.append(x)
-            else:
-                if x not in choice and x not in player.abilities and not x.RangeOnly:
-                    choice.append(x)
+    unique_abilities_map = {
+        379168159: [special_abilities.Triseps],
+        265872172: [special_abilities.Isaev, special_abilities.Titan, special_abilities.Shayton, special_abilities.Hayot, special_abilities.Hukmdor],
+        5419613050: [special_abilities.Shayton, special_abilities.Hayot, special_abilities.Hukmdor, special_abilities.Titan],
+        1346718456: [special_abilities.Isaev],
+    }
+
+    all_abilities = [ab for ab in special_abilities.abilities if ab not in player.abilities]
+
+    if player.weapon.Melee:
+        all_abilities = [ab for ab in all_abilities if not ab.RangeOnly]
+    else:
+        all_abilities = [ab for ab in all_abilities if not ab.MeleeOnly]
+
+    unique_pool = unique_abilities_map.get(player.chat_id, [])
+    normal_pool = [ab for ab in all_abilities if ab not in unique_pool]
+
+    if len(normal_pool) >= 4:
+        choice = random.sample(normal_pool, 4)
+    else:
+        choice = normal_pool[:]
+
+    if unique_pool:
+        unique = random.choice(unique_pool)
+        if unique not in choice:
+            choice.append(unique)
+
+    for ab in choice:
+        if ab in special_abilities.unique_abilities:
+            callback_data = f'unique_a{special_abilities.unique_abilities.index(ab)}'
+            info_data = f'unique_i{special_abilities.unique_abilities.index(ab)}'
         else:
-            if len(player.team.players) == 1:
-                if x not in choice and x not in player.abilities and not x.MeleeOnly and not x.TeamOnly:
-                    choice.append(x)
-            else:
-                if x not in choice and x not in player.abilities and not x.MeleeOnly:
-                    choice.append(x)
+            callback_data = f'a{special_abilities.abilities.index(ab)}'
+            info_data = f'i{special_abilities.abilities.index(ab)}'
 
-    for c in choice:
-        callback_button1 = types.InlineKeyboardButton(
-            text=c.name,
-            callback_data='a' + str(special_abilities.abilities.index(c))
-        )
-        callback_button2 = types.InlineKeyboardButton(
-            text='Info',
-            callback_data='i' + str(special_abilities.abilities.index(c))
-        )
-        keyboard.add(callback_button1, callback_button2)
-
-    # Уникальные, если разрешено
-    if player.chat_id in [1346718456, 265872172, 5419613050]:
-        for ability in special_abilities.unique_abilities:
-            btn1 = types.InlineKeyboardButton(
-                text=ability.name,
-                callback_data='unique_a' + str(special_abilities.unique_abilities.index(ability))
-            )
-            btn2 = types.InlineKeyboardButton(
-                text='Info',
-                callback_data='unique_i' + str(special_abilities.unique_abilities.index(ability))
-            )
-            keyboard.add(btn1, btn2)
+        btn_select = types.InlineKeyboardButton(text=ab.name, callback_data=callback_data)
+        btn_info = types.InlineKeyboardButton(text='Info', callback_data=info_data)
+        keyboard.add(btn_select, btn_info)
 
     bot.send_message(
         player.chat_id,
-        f'🧠 Yana qobiliyat tanlang. Qolgan: {player.maxabilities - len(player.abilities)}',
+        f'🧠 Qobiliyatni tanlang. Maksimal ruxsat etilgan: {player.maxabilities}',
         reply_markup=keyboard
     )
     
