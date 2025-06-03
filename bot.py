@@ -637,18 +637,14 @@ def action(call):
             found = False
 
         if game.gamestate == game.gamestates[0]:
-            print('Guruh jamlanishi.')
             for p in game.pending_players:
                 if call.from_user.id == p.chat_id:
-                    print('O`yinchi topildi')
                     if call.data == 'team1':
-                        print('Guruh-1')
                         game.pending_team1.append(p)
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                               text="Siz guruhga qo`shildingiz " + game.pending_team1[0].name)
                         bot.send_message(game.cid, p.name + ' quyidagi tomonda jang qiladi: ' + game.pending_team1[0].name)
                     if call.data == 'team2':
-                        print('Guruh-2')
                         game.pending_team2.append(p)
                         bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                               text="Siz guruhga qo`shildingiz " + game.pending_team2[0].name)
@@ -656,14 +652,13 @@ def action(call):
 
         elif game.gamestate == 'weapon' and found:
             if call.data[0] == 'a' and call.data[0:1] != 'at':
-                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                                      text="Qurollar tanlandi: " + (call.data[1:]))
                 for w in Weapon_list.fullweaponlist:
                     if w.name == call.data[1:]:
                         actor.weapon = w
                         break
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                      text="Qurol tanlandi: " + actor.weapon.name)
                 game.weaponcounter -= 1
-                print(actor.name + ' qurol tanladi.')
 
         elif game.gamestate == 'ability' and found:
             if call.data.startswith('i') and len(call.data) < 4:
@@ -688,10 +683,7 @@ def action(call):
                 if len(actor.abilities) < actor.maxabilities:
                     utils.get_ability(actor)
                 else:
-                    try:
-                        game.abilitycounter -= 1
-                    except:
-                        pass
+                    game.abilitycounter -= 1
 
             elif call.data.startswith('unique_a'):
                 if len(actor.abilities) >= actor.maxabilities:
@@ -709,13 +701,10 @@ def action(call):
                 if len(actor.abilities) < actor.maxabilities:
                     utils.get_ability(actor)
                 else:
-                    try:
-                        game.abilitycounter -= 1
-                    except:
-                        pass
+                    game.abilitycounter -= 1
 
         elif game.gamestate == game.gamestates[3] and found:
-            pass  # [оставшийся боевой код обработки item, skills, moves и т.д.]
+            pass  # Остальной боевой код
 
     else:
         if call.data == 'change_weapon':
@@ -745,11 +734,11 @@ def action(call):
             changed = datahandler.add_item(call.message.chat.id, item_id)
             data = bot_handlers.items_menu(call.from_user.id)
             if changed:
-                bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Invertor o`zgardi!")
+                bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Invertor ozgardi!")
                 bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.message.message_id,
                                       reply_markup=data[1])
             else:
-                bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Oldin hozirgi narsalarni o`zgartiring.")
+                bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Oldin hozirgi narsalarni ozgartiring.")
         elif call.data[:11] == 'delete_item':
             item_id = call.data[11:]
             true = datahandler.delete_item(call.message.chat.id, item_id)
@@ -762,11 +751,11 @@ def action(call):
             changed = datahandler.add_skill(call.message.chat.id, skill_name)
             data = bot_handlers.skills_menu(call.from_user.id)
             if changed:
-                bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Qobiliyatlar o`zgartirildi!")
+                bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Qobiliyatlar ozgartirildi!")
                 bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.message.message_id,
                                       reply_markup=data[1])
             else:
-                bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Oldin hozirgi qobiliyatlarni o`zgartiring.")
+                bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Oldin hozirgi qobiliyatlarni ozgartiring.")
         elif call.data[:12] == 'delete_skill':
             skill_name = call.data[12:]
             true = datahandler.delete_skill(call.message.chat.id, skill_name)
@@ -778,7 +767,6 @@ def action(call):
             data = bot_handlers.player_menu(call.from_user.first_name, call.from_user.id)
             bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.message.message_id,
                                   reply_markup=data[1])
-
 from telebot.types import Message
 from config import admins
 
