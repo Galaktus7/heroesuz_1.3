@@ -180,16 +180,16 @@ def start_game(message):
         bot_handlers.start_game(9, message.chat.id)
         bot.send_photo(message.chat.id,config.supid,caption="☠️𝐒𝐞𝐧𝐢𝐧𝐠 𝐨`𝐥𝐢𝐦 𝐯𝐚𝐪𝐭𝐢𝐧𝐠 𝐤𝐞𝐥𝐝𝐢... 🚪𝐍𝐚𝐫𝐢𝐠𝐢 𝐝𝐮𝐧𝐲𝐨𝐠𝐚 𝐫𝐚𝐯𝐨𝐧𝐚 𝐛𝐨`𝐥𝐢𝐬𝐡𝐢𝐧𝐠 𝐮𝐜𝐡𝐮𝐧 /join 𝐤𝐧𝐨𝐩𝐤𝐚𝐬𝐢𝐧𝐢 𝐛𝐨𝐬.")
     
-@bot.message_handler(commands=["randomgame"])
-def start_game(message):
-    if message.chat.id in Main_classes.existing_games:
-        pass
-    else:
-        bot_handlers.start_game(10, message.chat.id)  # Новый режим — 4
-        bot.send_message(message.chat.id, "🎲 Random jangga qo‘shiling: /join")    
+#@bot.message_handler(commands=["randomgame"])
+#def start_game(message):
+ #   if message.chat.id in Main_classes.existing_games:
+  #      pass
+   # else:
+    #    bot_handlers.start_game(10, message.chat.id)  # Новый режим — 4
+     #   bot.send_message(message.chat.id, "🎲 Random jangga qo‘shiling: /join")    
     
 # ✅ Команда /top (удалили дубль, скрываем игроков с рейтингом 1000)
-@bot.message_handler(commands=['top'])
+@bot.message_handler(commands=['reyting'])
 def show_top(message):
     top_players = datahandler.get_top_ratings(limit=50)
     filtered = [p for p in top_players if p.get("rating", 1000) != 1000]
@@ -206,7 +206,7 @@ def show_top(message):
 
 
 # ✅ Команда /rating (от себя, по реплаю, по ID)
-@bot.message_handler(commands=['rating'])
+@bot.message_handler(commands=['reyt'])
 def show_rating(message):
     chat_id = message.chat.id
     from_user = message.from_user  # ← чтобы получить ID игрока, даже если в группе
@@ -247,32 +247,32 @@ def show_rating(message):
     else:
         bot.send_message(chat_id, f"{name}, sizning reytingingiz: {rating} Elo")
 
-@bot.message_handler(commands=['qobiliyat'])
-def set_custom_ability_limit(message):
-    user_id = message.from_user.id
-    print("❗️DEBUG user_id =", user_id)
-    print("❗️DEBUG dict_players.keys() =", Main_classes.dict_players.keys())
-    player = Main_classes.dict_players.get(user_id)
+#@bot.message_handler(commands=['qobiliyat'])
+#def set_custom_ability_limit(message):
+ #   user_id = message.from_user.id
+  #  print("❗️DEBUG user_id =", user_id)
+   # print("❗️DEBUG dict_players.keys() =", Main_classes.dict_players.keys())
+    #player = Main_classes.dict_players.get(user_id)
 
-    if not player or not hasattr(player, 'game'):
-        bot.send_message(message.chat.id, "❗️Siz o'yinda emassiz.")
-        return
+  #  if not player or not hasattr(player, 'game'):
+   #     bot.send_message(message.chat.id, "❗️Siz o'yinda emassiz.")
+    #    return
 
-    game = player.game
-    if game.gametype != 'normal':
-        bot.send_message(message.chat.id, "❗️Bu buyruq faqat oddiy /game rejimida ishlaydi.")
-        return
+   # game = player.game
+    #if game.gametype != 'normal':
+     #   bot.send_message(message.chat.id, "❗️Bu buyruq faqat oddiy /game rejimida ishlaydi.")
+      #  return
 
-    try:
-        count = int(message.text.split(' ')[1])
-        if count < 2 or count > 8:
-            raise ValueError
-    except (IndexError, ValueError):
-        bot.send_message(message.chat.id, "❗️Foydalanish: /qobiliyat [2-8]")
-        return
+  #  try:
+  #      count = int(message.text.split(' ')[1])
+  #      if count < 2 or count > 8:
+   #         raise ValueError
+    #except (IndexError, ValueError):
+     #   bot.send_message(message.chat.id, "❗️Foydalanish: /qobiliyat [2-8]")
+      #  return
 
-    game.ability_count = count
-    bot.send_message(message.chat.id, f"🧠 Endi barcha o'yinchilar {count} ta qobiliyat tanlashlari mumkin bo'ladi.")
+    #game.ability_count = count
+    #bot.send_message(message.chat.id, f"🧠 Endi barcha o'yinchilar {count} ta qobiliyat tanlashlari mumkin bo'ladi.")
 
 @bot.message_handler(commands=["fight"])
 def start_game(message):
@@ -556,9 +556,9 @@ def reyting(message):
     top_games = sorted(stats, key=lambda x: x['games'], reverse=True)[:5]
 
     text = "🏆 Reyting:\n\n"
-    text += "1. 🥇 Top 3 (1000+ o‘yin):\n" + "\n".join([format_player(p) for p in part1]) + "\n\n"
-    text += "2. 🥈 Top 3 (500–999 o‘yin):\n" + "\n".join([format_player(p) for p in part2]) + "\n\n"
-    text += "3. 🥉 Top 3 (100–499 o‘yin):\n" + "\n".join([format_player(p) for p in part3]) + "\n\n"
+    text += "1. 🥇 Top 3 Eng statistikasi baland o'yinchilar (1000+ o‘yin):\n" + "\n".join([format_player(p) for p in part1]) + "\n\n"
+    text += "2. 🥈 Top 3 Eng statistikasi baland o'yinchilar (500–999 o‘yin):\n" + "\n".join([format_player(p) for p in part2]) + "\n\n"
+    text += "3. 🥉 Top 3 Eng statistikasi baland o'yinchilar (100–499 o‘yin):\n" + "\n".join([format_player(p) for p in part3]) + "\n\n"
     text += "4. 🎮 Eng ko‘p o‘ynaganlar:\n" + "\n".join([f"- {p['name']} ({p['games']} o‘yin)" for p in top_games])
 
     bot.send_message(message.chat.id, text)
@@ -665,9 +665,57 @@ def action(call):
                 game.weaponcounter -= 1
                 print(actor.name + ' qurol tanladi.')
 
+        elif game.gamestate == 'ability' and found:
+            if call.data.startswith('i') and len(call.data) < 4:
+                bot.send_message(call.from_user.id, special_abilities.abilities[int(call.data[1:])].info)
+
+            elif call.data.startswith('unique_i'):
+                bot.send_message(call.from_user.id, special_abilities.unique_abilities[int(call.data[8:])].info)
+
+            elif call.data.startswith('a') and len(call.data) < 4:
+                if len(actor.abilities) >= actor.maxabilities:
+                    bot.answer_callback_query(call.id, text=f"❗️Siz {actor.maxabilities} ta qobiliyatni tanladingiz")
+                    return
+                ability = special_abilities.abilities[int(call.data[1:])]
+                if ability not in actor.abilities:
+                    actor.abilities.append(ability)
+                    if hasattr(ability, 'aquare'):
+                        ability.aquare(ability, actor)
+                    if hasattr(ability, 'aquareonce'):
+                        ability.aquareonce(ability, actor)
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                      text="Qobiliyat tanlandi: " + ability.name)
+                if len(actor.abilities) < actor.maxabilities:
+                    utils.get_ability(actor)
+                else:
+                    try:
+                        game.abilitycounter -= 1
+                    except:
+                        pass
+
+            elif call.data.startswith('unique_a'):
+                if len(actor.abilities) >= actor.maxabilities:
+                    bot.answer_callback_query(call.id, text=f"❗️Siz {actor.maxabilities} ta qobiliyatni tanladingiz")
+                    return
+                ability = special_abilities.unique_abilities[int(call.data[8:])]
+                if ability not in actor.abilities:
+                    actor.abilities.append(ability)
+                    if hasattr(ability, 'aquare'):
+                        ability.aquare(ability, actor)
+                    if hasattr(ability, 'aquareonce'):
+                        ability.aquareonce(ability, actor)
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                      text="Qobiliyat tanlandi: " + ability.name)
+                if len(actor.abilities) < actor.maxabilities:
+                    utils.get_ability(actor)
+                else:
+                    try:
+                        game.abilitycounter -= 1
+                    except:
+                        pass
+
         elif game.gamestate == game.gamestates[3] and found:
-            # [оставшийся боевой код обработки item, skills, moves и т.д.]
-            pass
+            pass  # [оставшийся боевой код обработки item, skills, moves и т.д.]
 
     else:
         if call.data == 'change_weapon':
