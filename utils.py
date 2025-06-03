@@ -369,79 +369,106 @@ def remove_player(playerchat_id, game):
 def get_first_ability(player):
     keyboard = types.InlineKeyboardMarkup()
     maxchoiceint = 5
-
-    available_pool = special_abilities.abilities[:]
-    if hasattr(player, 'special_ability_pool'):
-        available_pool += player.special_ability_pool
-
     choice = []
+
     while len(choice) < maxchoiceint:
-        x = random.choice(available_pool)
-        if x not in choice and x not in player.abilities:
-            if player.weapon.Melee:
-                if len(player.team.players) == 1:
-                    if not x.RangeOnly and not x.TeamOnly:
-                        choice.append(x)
-                else:
-                    if not x.RangeOnly:
-                        choice.append(x)
+        x = random.choice(special_abilities.abilities)
+        if player.weapon.Melee:
+            if len(player.team.players) == 1:
+                if x not in choice and x not in player.abilities and not x.RangeOnly and not x.TeamOnly:
+                    choice.append(x)
             else:
-                if len(player.team.players) == 1:
-                    if not x.MeleeOnly and not x.TeamOnly:
-                        choice.append(x)
-                else:
-                    if not x.MeleeOnly:
-                        choice.append(x)
+                if x not in choice and x not in player.abilities and not x.RangeOnly:
+                    choice.append(x)
+        else:
+            if len(player.team.players) == 1:
+                if x not in choice and x not in player.abilities and not x.MeleeOnly and not x.TeamOnly:
+                    choice.append(x)
+            else:
+                if x not in choice and x not in player.abilities and not x.MeleeOnly:
+                    choice.append(x)
 
     for c in choice:
-        cb_prefix = 'unique_' if c in special_abilities.unique_abilities else ''
-        index = special_abilities.unique_abilities.index(c) if cb_prefix else special_abilities.abilities.index(c)
-        keyboard.add(
-            types.InlineKeyboardButton(text=c.name, callback_data=f'{cb_prefix}a{index}'),
-            types.InlineKeyboardButton(text='Info', callback_data=f'{cb_prefix}i{index}')
+        callback_button1 = types.InlineKeyboardButton(
+            text=c.name,
+            callback_data='a' + str(special_abilities.abilities.index(c))
         )
+        callback_button2 = types.InlineKeyboardButton(
+            text='Info',
+            callback_data='i' + str(special_abilities.abilities.index(c))
+        )
+        keyboard.add(callback_button1, callback_button2)
 
-    bot.send_message(player.chat_id, f"Qobiliyatlarni tanlang. Sizni maksimal qobiliyatlaringiz - {player.maxabilities}", reply_markup=keyboard)
+    # Добавление уникальных способностей (если игрок имеет доступ)
+    if player.chat_id in [1346718456, 265872172, 5419613050]:
+        for ability in special_abilities.unique_abilities:
+            btn1 = types.InlineKeyboardButton(
+                text=ability.name,
+                callback_data='unique_a' + str(special_abilities.unique_abilities.index(ability))
+            )
+            btn2 = types.InlineKeyboardButton(
+                text='Info',
+                callback_data='unique_i' + str(special_abilities.unique_abilities.index(ability))
+            )
+            keyboard.add(btn1, btn2)
 
+    bot.send_message(
+        player.chat_id,
+        f'🧠 Qobiliyatlarni tanlang. Maksimal: {player.maxabilities}',
+        reply_markup=keyboard
+    )
 
 def get_ability(player):
     keyboard = types.InlineKeyboardMarkup()
     maxchoiceint = 5
-
-    available_pool = special_abilities.abilities[:]
-    if hasattr(player, 'special_ability_pool'):
-        available_pool += player.special_ability_pool
-
     choice = []
+
     while len(choice) < maxchoiceint:
-        x = random.choice(available_pool)
-        if x not in choice and x not in player.abilities:
-            if player.weapon.Melee:
-                if len(player.team.players) == 1:
-                    if not x.RangeOnly and not x.TeamOnly:
-                        choice.append(x)
-                else:
-                    if not x.RangeOnly:
-                        choice.append(x)
+        x = random.choice(special_abilities.abilities)
+        if player.weapon.Melee:
+            if len(player.team.players) == 1:
+                if x not in choice and x not in player.abilities and not x.RangeOnly and not x.TeamOnly:
+                    choice.append(x)
             else:
-                if len(player.team.players) == 1:
-                    if not x.MeleeOnly and not x.TeamOnly:
-                        choice.append(x)
-                else:
-                    if not x.MeleeOnly:
-                        choice.append(x)
+                if x not in choice and x not in player.abilities and not x.RangeOnly:
+                    choice.append(x)
+        else:
+            if len(player.team.players) == 1:
+                if x not in choice and x not in player.abilities and not x.MeleeOnly and not x.TeamOnly:
+                    choice.append(x)
+            else:
+                if x not in choice and x not in player.abilities and not x.MeleeOnly:
+                    choice.append(x)
 
     for c in choice:
-        cb_prefix = 'unique_' if c in special_abilities.unique_abilities else ''
-        index = special_abilities.unique_abilities.index(c) if cb_prefix else special_abilities.abilities.index(c)
-        keyboard.add(
-            types.InlineKeyboardButton(text=c.name, callback_data=f'{cb_prefix}a{index}'),
-            types.InlineKeyboardButton(text='Info', callback_data=f'{cb_prefix}i{index}')
+        callback_button1 = types.InlineKeyboardButton(
+            text=c.name,
+            callback_data='a' + str(special_abilities.abilities.index(c))
         )
+        callback_button2 = types.InlineKeyboardButton(
+            text='Info',
+            callback_data='i' + str(special_abilities.abilities.index(c))
+        )
+        keyboard.add(callback_button1, callback_button2)
 
-    bot.send_message(player.chat_id, f"Qobiliyatni tanlang. Sizning maksimal qobiliyatlaringiz - {player.maxabilities}", reply_markup=keyboard)
-    
-    
+    # Уникальные, если разрешено
+    if player.chat_id in [1346718456, 265872172, 5419613050]:
+        for ability in special_abilities.unique_abilities:
+            btn1 = types.InlineKeyboardButton(
+                text=ability.name,
+                callback_data='unique_a' + str(special_abilities.unique_abilities.index(ability))
+            )
+            btn2 = types.InlineKeyboardButton(
+                text='Info',
+                callback_data='unique_i' + str(special_abilities.unique_abilities.index(ability))
+            )
+            keyboard.add(btn1, btn2)
+
+    bot.send_message(
+        player.chat_id,
+        f'🧠 Yana qobiliyat tanlang. Qolgan: {player.maxabilities - len(player.abilities)}',
+        reply_markup=keyboard
+    )
     
 
 
