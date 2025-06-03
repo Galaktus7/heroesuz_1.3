@@ -2,7 +2,7 @@ import os
 LOG_CHANNEL_ID = '-1002639763893'
 
 admins = [int(x) for x in "1346718456,265872172,379168159".split(",")]
-token = '7315904022:AAHLtlGpPpUxkllvjpfTnNSpzEMv_-zElIQ'
+token = '8080452545:AAF2XQ1QZugaMgoihO3LJHpVHIe6SMf1Dso'
 ratid = 'AgADAgADvasxGxGXeUnydITohK6CT0Y8hA8ABBQySQonK27DhEQDAAEC'
 newid = 'AgADAgAD5aoxG_lWeUnx8zvZyrnBQ4W_UQ8ABHdGzvOMj3Qu-9EFAAEC'
 terrorid = 'AgADAgAD5KoxG_lWeUkIaPiVI3KM2XZrUw8ABD8X9N3NFnoU388FAAEC'
