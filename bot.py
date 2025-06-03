@@ -616,7 +616,242 @@ def find_file_ids(message):
 
 
 
-bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=data[1])
+@bot.callback_query_handler(func=lambda call: True)
+def action(call):
+    if call.message:
+        print("Получено.")
+        if call.data == '1':
+                bot.send_message(call.from_user.id, call.message.text)
+    game = utils.get_game_from_player(call.from_user.id)
+
+    if game is not None:
+        print("Игра найдена.")
+        found = True
+        actor = None
+        try:
+            actor = game.player_dict[call.from_user.id]
+        except:
+            print('xatolik')
+            found = False
+        if game.gamestate == game.gamestates[0] :
+            print('Guruh jamlanishi.')
+            for p in game.pending_players:
+                if call.from_user.id == p.chat_id:
+                    print('O`yinchi topildi')
+                    if call.data == 'team1':
+                        print('Guruh-1')
+                        game.pending_team1.append(p)
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Siz guruhga qo`shildingiz " + game.pending_team1[0].name)
+                        bot.send_message(game.cid, p.name + ' quyidagi tomonda jang qiladi: ' + game.pending_team1[0].name)
+
+                    if call.data == 'team2':
+                        print('Guruh-2')
+                        game.pending_team2.append(p)
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Siz guruhga qo`shildingiz " + game.pending_team2[0].name)
+                        bot.send_message(game.cid,
+                                         p.name + ' quyidagi tomonda jang qiladi: ' + game.pending_team2[0].name)
+        elif game.gamestate == 'weapon' and found:
+            if call.data[0] == 'a' and call.data[0:1] != 'at':
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                      text="Qurollar tanlandi: " + (call.data[1:]))
+                for w in Weapon_list.fullweaponlist:
+                    if w.name == call.data[1:]:
+                        actor.weapon = w
+                        break
+                game.weaponcounter -= 1
+                print(actor.name + ' qurol tanladi.')
+        elif game.gamestate == 'ability' and found:
+            if call.data[0] == 'i'and len(call.data) < 4:
+                    bot.send_message(call.from_user.id,special_abilities.abilities[int(call.data[1:])].info)
+            if call.data[:8] == 'unique_i':
+                    bot.send_message(call.from_user.id,special_abilities.unique_abilities[int(call.data[8:])].info)
+            elif call.data[0] == 'a' and len(call.data) < 4:
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                      text="Qobiliyatlar tanlandi: " + special_abilities.abilities[int(call.data[1:])].name)
+                actor.abilities.append(special_abilities.abilities[int(call.data[1:])])
+                if actor.maxabilities > \
+                    len(actor.abilities):
+                    utils.get_ability(actor)
+                else:
+                    try:
+                        game.abilitycounter -= 1
+                        print (actor.name + ' qobiliyat tanladi.')
+                    except:
+                        pass
+            elif call.data[:8] == 'unique_a':
+                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                      text="Qobiliyat tanlandi: " + special_abilities.unique_abilities[int(call.data[8:])].name)
+                actor.abilities.append(special_abilities.unique_abilities[int(call.data[8:])])
+                if actor.maxabilities > \
+                    len(actor.abilities):
+                    utils.get_ability(actor)
+                else:
+                    try:
+                        game.abilitycounter -= 1
+                        print (actor.name + ' qobiliyatlarni tanladi.')
+                    except:
+                        pass
+        elif game.gamestate == game.gamestates[3] and found:
+                if actor in game.fight.playerpool:
+                    if call.data[0:4] == 'item':
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Yurish " + str(actor.fight.round) + ': ' + Item_list.items[
+                                                  call.data[0:7]].name)
+                    if call.data[0:4] == 'vint':
+                        if call.data[0:8] == 'vintinfo':
+                            bot.send_message(call.from_user.id, special_abilities.abilities[int(call.data[8:])].info)
+                        else:
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                  text="Vaqtinchalik qobiliyat tanlandi: " + special_abilities.abilities[
+                                                      int(call.data[4:])].name)
+                            x = len(actor.abilities)
+                            actor.abilities.append(special_abilities.abilities[int(call.data[4:])])
+                            while x == len(actor.abilities):
+                                pass
+                            actor.abilities[-1].aquare(actor.abilities[-1], actor)
+                            Fighting.send_action(actor, actor.fight)
+                    elif call.data[0:4] == 'move':
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Yurish " + str(actor.fight.round) + ": Yaqinlashish.")
+                        actor.turn = 'move'
+                        actor.fight.playerpool.remove(actor)
+                    elif call.data[0:9] == 'inventory':
+                        bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+                        utils.send_inventory(actor)
+                    elif call.data[0:6] == 'skills':
+                        bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+                        utils.send_skills(actor)
+                    elif call.data[0:6] == 'cancel':
+                        bot.delete_message(chat_id=call.message.chat.id, message_id=call.message.message_id)
+                        Fighting.send_action(actor, actor.fight)
+                    elif call.data[0:3] == 'aim':
+                        print(actor.name + ' nishonga oldi.')
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Maxsus harakatlar.")
+                        actor.weapon.special(actor, call)
+                        actor.turn = 'aim'
+                        actor.fight.playerpool.remove(actor)
+                    elif call.data == 'take' + str(actor.fight.round):
+                        print(actor.name + ' qurolni oldi.')
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Yurish " + str(actor.fight.round) + ": Qurolni olish.")
+                        actor.turn = 'take' + str(actor.fight.round)
+                        actor.fight.playerpool.remove(actor)
+                    elif call.data[0:13] == 'weaponspecial':
+                        print(actor.name + ' nishonga oldi.')
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Maxsus hujum.")
+                        actor.weapon.special(actor, call.data[13:])
+                        actor.turn = 'weaponspecial'
+                        actor.fight.playerpool.remove(actor)
+                    elif call.data[0:4] == 'draw':
+                        print(actor.name + ' nishonga oldi.')
+
+                        if actor.bonusaccuracy == 1:
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                  text='Siz kamon ipini cho`zayabsiz. Kamon kuchi ortdi!'
+                                                           ' Dushmanni karaxt qilib qo`yish imkoni paydo bo`ldi!')
+                        else:
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Siz kamon ipini cho`zayabsiz. Kamon kuchi ortdi!")
+                        actor.weapon.special(actor, call)
+                        actor.turn = 'draw'
+                        actor.fight.playerpool.remove(actor)
+                    elif call.data[0:4] == 'info':
+                        if call.data == 'info':
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Ma`lumot jo`natildi.")
+                            utils.player_info(actor)
+
+                        else:
+                            if call.data[4:] == 'cancel':
+                                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                      text="Bekor qilindi")
+                            else:
+                                bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                      text="Ma`lumot jo`natildi.")
+                                utils.player_info(utils.actor_from_id(call.data[4:], actor.game),cid=actor.chat_id)
+                                actor.itemlist.remove(Item_list.mental)
+                                actor.mentalrefresh = actor.fight.round + 2
+
+                        Fighting.send_action(actor, actor.fight)
+                    elif call.data[0:2] == 'op':
+                        if call.data[2:] == 'cancel':
+
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                  text="Bekor qilindi")
+                            Fighting.send_action(actor, actor.fight)
+                        else:
+                            print(actor.name + ' raqibni tanlash.')
+                            actor.target = utils.actor_from_id(call.data[2:], game)
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                  text="Raqib tanlandi: " + actor.target.name)
+                            try:
+                                actor.fight.playerpool.remove(actor)
+                            except:
+                                print('O`yinchini nishonda chiqarib bo`lmadi.')
+                                pass
+                    elif call.data[0:5] == 'itemh':
+                        Item_list.items[call.data[0:7]].useact(actor)
+                        Fighting.send_action(actor, actor.fight)
+                    elif call.data[0:7] == 'release':
+                        actor.bonusaccuracy = 0
+                        actor.Armed = False
+                        bot.delete_message(actor.chat_id, actor.choicemessage)
+                        bot.send_message(actor.chat_id, 'Siz ipni cho`zishni to`xtatdingiz.')
+                        Fighting.send_action(actor, actor.fight)
+                    elif call.data[0:5] == 'items':Item_list.items[call.data[0:7]].useact(actor)
+                    elif call.data[0:5] == 'itemt' or call.data[0:6] == 'itemat':
+                        actor.turn = call.data
+                        print(str(actor.turn) + ' ' + str(actor.fight.round) + ' ' + str(actor.name))
+                        Item_list.items[call.data[0:7]].useact(actor)
+                    elif call.data[0:6] == 'spitem':
+                        if call.data[6:] == 'cancel':
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                  text="Bekor qilindi")
+                            Fighting.send_action(actor, actor.fight)
+                        else:
+                            actor.itemtarget = utils.actor_from_id(call.data[6:], actor.game)
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                  text="Nishon - " + actor.itemtarget.name)
+                            actor.fight.playerpool.remove(actor)
+                    elif call.data[0:5] == 'mitem':
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Qabul qilindi.")
+                        Item_list.items[call.data[0:7]].useact(actor)
+                    elif call.data[0:6] == 'attack':
+                        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                              text="Yurish " + str(actor.fight.round) + ": Hujum.")
+                        actor.weapon.get_action(actor, call)
+                    else:
+
+                        actor.turn = call.data
+                        try:
+                            actor.fight.playerpool.remove(actor)
+                        except:
+                            print('O`yinchini nishonda chiqarib bo`lmadi(oddiy yurish).')
+                            pass
+                        print(str(actor.turn) + ' ' + str(actor.fight.round) + ' ' + str(actor.name))
+
+                        if call.data[:4] == 'skip':
+                            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                                  text="Yurish " + str(actor.fight.round) + ": Yurish o`tkazib yuborish.")
+                        elif call.data == 'reload' + str(actor.fight.round):
+                            if actor.weapon.Melee:
+                                bot.edit_message_text(chat_id=actor.chat_id, message_id=actor.choicemessage.message_id,
+                                                      text="Yurish " + str(actor.fight.round) + ': ' + 'Dam olish')
+                            else:
+                                bot.edit_message_text(chat_id=actor.chat_id, message_id=actor.choicemessage.message_id,
+                                                      text="Yurish " + str(actor.fight.round) + ': ' + 'Qayta o`qlash')
+                        elif call.data == 'evade' + str(actor.fight.round):
+                            bot.edit_message_text(chat_id=actor.chat_id, message_id=actor.choicemessage.message_id,
+                                                    text="Yurish " + str(actor.fight.round) + ': ' + 'Chetlashmoq')
+    else:
+        if call.data == 'change_weapon':
+            data = bot_handlers.weapon_menu(call.from_user.id)
+            bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.message.message_id, reply_markup=data[1])
         elif call.data == 'change_items':
             data = bot_handlers.items_menu(call.from_user.id)
             bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.message.message_id,
@@ -643,11 +878,11 @@ bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.mes
             changed = datahandler.add_item(call.message.chat.id, item_id)
             data = bot_handlers.items_menu(call.from_user.id)
             if changed:
-                bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Invertor ozgardi!")
+                bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Invertor o`zgardi!")
                 bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.message.message_id,
                                       reply_markup=data[1])
             else:
-                bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Oldin hozirgi narsalarni ozgartiring.")
+                bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Oldin hozirgi narsalarni o`zgartiring.")
 
         elif call.data[:11] == 'delete_item':
             print('1')
@@ -662,11 +897,11 @@ bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.mes
             changed = datahandler.add_skill(call.message.chat.id, skill_name)
             data = bot_handlers.skills_menu(call.from_user.id)
             if changed:
-                bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Qobiliyatlar ozgartirildi!")
+                bot.answer_callback_query(callback_query_id=call.id, show_alert=False, text="Qobiliyatlar o`zgartirildi!")
                 bot.edit_message_text(data[0], chat_id=call.message.chat.id, message_id=call.message.message_id,
                                       reply_markup=data[1])
             else:
-                bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Oldin hozirgi qobiliyatlarni ozgartiring.")
+                bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="Oldin hozirgi qobiliyatlarni o`zgartiring.")
 
         elif call.data[:12] == 'delete_skill':
             print('1')
