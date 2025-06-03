@@ -534,7 +534,7 @@ def stats_handler(message):
         bot.send_message(message.chat.id, f"{target_name}:\n{data[0]} ta o‘yin o‘ynalgan.\n"
                                           f"{data[1]} ta o‘yin yutgan.\n{winrate}% yutuq.")
                                                                                    
-@bot.message_handler(commands=["reyting"])
+@bot.message_handler(commands=["top"])
 def reyting(message):
     stats = datahandler.get_all_stats()  # Ожидается список словарей [{'id': ..., 'wins': ..., 'games': ..., 'name': ...}, ...]
     if not stats:
